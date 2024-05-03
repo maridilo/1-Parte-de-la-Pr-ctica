@@ -4,62 +4,128 @@ import Logica.Experimento;
 import Datos.Archivos;
 import Datos.PoblacionBacterias;
 
-import java.util.Scanner;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class InterfazUsuario {
     private Experimento experimento;
     private Archivos archivos;
+    private JFrame frame;
 
     public InterfazUsuario() {
         experimento = new Experimento();
         archivos = new Archivos();
+        frame = new JFrame("Interfaz de Usuario");
+        frame.setSize(400, 200);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLocationRelativeTo(null);
+
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(InterfazUsuario.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+
+        // Establecer el administrador de diseño
+        frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
+
+        JButton button = new JButton("Mostrar Menú");
+
+        button.setFont(new java.awt.Font("Tahoma", 0, 24));
+        button.setBackground(new java.awt.Color(0, 102, 102));
+        button.setAlignmentX(JButton.CENTER_ALIGNMENT);
+
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mostrarMenu();
+            }
+        });
+
+        frame.getContentPane().add(button);
+        frame.setVisible(true);
     }
 
     public void mostrarMenu() {
-        System.out.println("1. Abrir un archivo que contenga un experimento");
-        System.out.println("2. Crear un nuevo experimento");
-        System.out.println("3. Crear una población de bacterias y añadirla al experimento actual");
-        System.out.println("4. Visualizar los nombres de todas las poblaciones de bacterias del experimento actual");
-        System.out.println("5. Borrar una población de bacterias del experimento actual");
-        System.out.println("6. Ver información detallada de una población de bacterias del experimento actual");
-        System.out.println("7. Guardar");
-        System.out.println("8. Guardar como");
-        System.out.println("9. Salir");
+        String[] options = new String[] {
+                "Abrir un archivo que contenga un experimento",
+                "Crear un nuevo experimento",
+                "Crear una población de bacterias y añadirla al experimento actual",
+                "Visualizar los nombres de todas las poblaciones de bacterias del experimento actual",
+                "Borrar una población de bacterias del experimento actual",
+                "Ver información detallada de una población de bacterias del experimento actual",
+                "Guardar",
+                "Guardar como",
+                "Salir"
+        };
+
+        JList<String> list = new JList<>(options);
+        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        JScrollPane scrollPane = new JScrollPane(list);
+        scrollPane.setPreferredSize(new Dimension(200, 200)); // Ajusta el tamaño según tus necesidades
+
+        int response = JOptionPane.showOptionDialog(frame, "Por favor, elija una opción del menú:", "Menú",
+                JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
+                null, options, options[0]);
+        ejecutarOpcion(response + 1);
     }
 
     public void ejecutarOpcion(int opcion) {
-        Scanner scanner = new Scanner(System.in);
         switch (opcion) {
             case 1:
-                // Implementar lógica para abrir un archivo
+                String nombreArchivo = JOptionPane.showInputDialog(frame, "Ingrese el nombre del archivo:");
+                experimento = archivos.abrirArchivo(nombreArchivo);
                 break;
             case 2:
-                // Implementar lógica para crear un nuevo experimento
+                experimento = new Experimento();
                 break;
             case 3:
-                // Implementar lógica para crear una nueva población de bacterias
+                // Aquí deberías pedir al usuario los datos necesarios para crear una nueva población de bacterias
+                // y luego agregarla al experimento actual.
                 break;
             case 4:
-                // Implementar lógica para visualizar los nombres de todas las poblaciones de bacterias
+                for (PoblacionBacterias poblacion : experimento.obtenerPoblaciones()) {
+                    System.out.println(poblacion.getNombre());
+                }
                 break;
             case 5:
-                // Implementar lógica para borrar una población de bacterias
+                String nombre = JOptionPane.showInputDialog(frame, "Ingrese el nombre de la población de bacterias que desea eliminar:");
+                experimento.eliminarPoblacion(nombre);
                 break;
             case 6:
-                // Implementar lógica para ver información detallada de una población de bacterias
+                nombre = JOptionPane.showInputDialog(frame, "Ingrese el nombre de la población de bacterias que desea ver:");
+                PoblacionBacterias poblacion = experimento.obtenerPoblacion(nombre);
+                if (poblacion != null) {
+                    // Aquí deberías imprimir la información detallada de la población de bacterias
+                } else {
+                    JOptionPane.showMessageDialog(frame, "No se encontró la población de bacterias.");
+                }
                 break;
             case 7:
-                // Implementar lógica para guardar
+                nombreArchivo = JOptionPane.showInputDialog(frame, "Ingrese el nombre del archivo donde desea guardar:");
+                archivos.guardarArchivo(nombreArchivo, experimento.obtenerPoblaciones());
                 break;
             case 8:
-                // Implementar lógica para guardar como
+                nombreArchivo = JOptionPane.showInputDialog(frame, "Ingrese el nombre del nuevo archivo donde desea guardar:");
+                archivos.guardarComoArchivo(nombreArchivo, experimento.obtenerPoblaciones());
                 break;
             case 9:
-                System.out.println("Saliendo...");
+                System.exit(0);
                 break;
             default:
-                System.out.println("Opción no válida. Por favor, elija una opción del menú.");
+                JOptionPane.showMessageDialog(frame, "Opción no válida. Por favor, elija una opción del menú.");
                 break;
         }
+    }
+
+    public static void main(String[] args) {
+        new InterfazUsuario();
     }
 }
