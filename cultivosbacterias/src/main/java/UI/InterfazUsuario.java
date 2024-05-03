@@ -18,7 +18,7 @@ public class InterfazUsuario {
         experimento = new Experimento();
         archivos = new Archivos();
         frame = new JFrame("Interfaz de Usuario");
-        frame.setSize(400, 200);
+        frame.setSize(200, 100);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
 
@@ -38,6 +38,7 @@ public class InterfazUsuario {
 
         JButton button = new JButton("Mostrar Menú");
 
+        button.setForeground(new java.awt.Color(255, 255, 255));
         button.setFont(new java.awt.Font("Tahoma", 0, 24));
         button.setBackground(new java.awt.Color(0, 102, 102));
         button.setAlignmentX(JButton.CENTER_ALIGNMENT);
@@ -68,13 +69,27 @@ public class InterfazUsuario {
 
         JList<String> list = new JList<>(options);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        JScrollPane scrollPane = new JScrollPane(list);
-        scrollPane.setPreferredSize(new Dimension(200, 200)); // Ajusta el tamaño según tus necesidades
+        list.setFixedCellWidth(400);
+        list.setFixedCellHeight(20);
+        list.setCellRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (c instanceof JLabel) {
+                    JLabel label = (JLabel) c;
+                    label.setText("<html>" + value.toString() + "</html>"); // Permite el ajuste de línea
+                }
+                return c;
+            }
+        });
 
-        int response = JOptionPane.showOptionDialog(frame, "Por favor, elija una opción del menú:", "Menú",
-                JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
-                null, options, options[0]);
-        ejecutarOpcion(response + 1);
+        JScrollPane scrollPane = new JScrollPane(list);
+        scrollPane.setPreferredSize(new Dimension(400, 200)); // Ajusta el tamaño según tus necesidades
+
+        int response = JOptionPane.showOptionDialog(frame, scrollPane, "Menú", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, null, null);
+        if (response != JOptionPane.CLOSED_OPTION) {
+            ejecutarOpcion(list.getSelectedIndex() + 1);
+        }
     }
 
     public void ejecutarOpcion(int opcion) {
