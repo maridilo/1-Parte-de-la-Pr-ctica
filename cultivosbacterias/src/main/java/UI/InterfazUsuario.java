@@ -39,6 +39,11 @@ public class InterfazUsuario {
         // Establecer el administrador de diseño
         frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
 
+        JMenu menu = new JMenu("Menu");
+        ImageIcon icon = new ImageIcon("icon.png");
+        JMenuItem menuItem = new JMenuItem("Opción del menú", icon);
+        menu.add(menuItem);
+
         JButton button = new JButton("Mostrar Menú");
 
         button.setForeground(new java.awt.Color(255, 255, 255));
