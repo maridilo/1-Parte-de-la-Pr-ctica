@@ -18,7 +18,7 @@ public class InterfazUsuario {
     private JFrame frame;
 
     public InterfazUsuario() {
-        experimento = new Experimento();
+        experimento = new Experimento("Experimento", "Descripción del experimento");
         archivos = new Archivos();
         frame = new JFrame("Interfaz de Usuario");
         frame.setSize(200, 100);
@@ -100,22 +100,30 @@ public class InterfazUsuario {
             case 1:
                 String nombreArchivo = JOptionPane.showInputDialog(frame, "Ingrese el nombre del archivo:");
                 experimento = archivos.abrirArchivo(nombreArchivo);
+                if (experimento != null) {
+                    JOptionPane.showMessageDialog(frame, "Se ha abierto el archivo correctamente.", "Archivo Abierto", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(frame, "No se pudo abrir el archivo.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
                 break;
             case 2:
-                experimento = new Experimento();
+                String nombre = JOptionPane.showInputDialog(frame, "Ingrese el nombre del nuevo experimento:");
+                String descripcion = JOptionPane.showInputDialog(frame, "Ingrese una descripción para el nuevo experimento:");
+                experimento = new Experimento(nombre, descripcion);
+                JOptionPane.showMessageDialog(frame, "Se ha creado un nuevo experimento.", "Nuevo Experimento", JOptionPane.INFORMATION_MESSAGE);
                 break;
             case 3:
                 String nombrePoblacion = JOptionPane.showInputDialog(frame, "Ingrese el nombre de la población de bacterias:");
-                String fechaInicioStr = JOptionPane.showInputDialog(frame, "Ingrese la fecha de inicio (formato: dd/mm/yyyy):");
-                String fechaFinStr = JOptionPane.showInputDialog(frame, "Ingrese la fecha de fin (formato: dd/mm/yyyy):");
-                Date fechaInicio = parseDate(fechaInicioStr);
-                Date fechaFin = parseDate(fechaFinStr);
+                Date fechaInicio = parseDate("Ingrese la fecha de inicio del experimento (dd/mm/yyyy):");
+                Date fechaFin = parseDate("Ingrese la fecha de fin del experimento (dd/mm/yyyy):");
                 int cantidadInicial = Integer.parseInt(JOptionPane.showInputDialog(frame, "Ingrese la cantidad inicial de bacterias:"));
                 double temperatura = Double.parseDouble(JOptionPane.showInputDialog(frame, "Ingrese la temperatura:"));
                 String condicionesLuz = JOptionPane.showInputDialog(frame, "Ingrese las condiciones de luz:");
                 int dosisInicialAlimento = Integer.parseInt(JOptionPane.showInputDialog(frame, "Ingrese la dosis inicial de alimento:"));
+                int dosisFinalAlimento = Integer.parseInt(JOptionPane.showInputDialog(frame, "Ingrese la dosis final de alimento:"));
 
                 PoblacionBacterias nuevaPoblacion = new PoblacionBacterias(nombrePoblacion, fechaInicio, fechaFin, cantidadInicial, temperatura, condicionesLuz, dosisInicialAlimento, 10, 100);
+                JOptionPane.showMessageDialog(frame, "Población de bacterias añadida con éxito al experimento actual.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
                 experimento.agregarPoblacion(nuevaPoblacion);
                 break;
             case 4:
@@ -124,8 +132,8 @@ public class InterfazUsuario {
                 }
                 break;
             case 5:
-                String nombre = JOptionPane.showInputDialog(frame, "Ingrese el nombre de la población de bacterias que desea eliminar:");
-                experimento.eliminarPoblacion(nombre);
+                String nombrePoblacioneliminar = JOptionPane.showInputDialog(frame, "Ingrese el nombre de la población de bacterias que desea eliminar:");
+                experimento.eliminarPoblacion(nombrePoblacioneliminar);
                 break;
             case 6:
                 nombre = JOptionPane.showInputDialog(frame, "Ingrese el nombre de la población de bacterias de la que desea ver la información detallada:");
@@ -152,7 +160,7 @@ public class InterfazUsuario {
                 break;
             case 7:
                 nombreArchivo = JOptionPane.showInputDialog(frame, "Ingrese el nombre del archivo donde desea guardar:");
-                archivos.guardarArchivo(nombreArchivo, experimento.obtenerPoblaciones());
+                archivos.guardarArchivo(nombreArchivo, experimento);
                 break;
             case 8:
                 nombreArchivo = JOptionPane.showInputDialog(frame, "Ingrese el nombre del nuevo archivo donde desea guardar:");
@@ -167,14 +175,18 @@ public class InterfazUsuario {
         }
     }
 
-    private Date parseDate(String dateStr) {
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-        try {
-            return formatter.parse(dateStr);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return null;
+    private Date parseDate(String mensaje) {
+        Date date = null;
+        while (date == null) {
+            String fechaStr = JOptionPane.showInputDialog(frame, mensaje);
+            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+            try {
+                date = formatter.parse(fechaStr);
+            } catch (ParseException e) {
+                JOptionPane.showMessageDialog(frame, "Fecha no válida. Por favor, ingrese la fecha en el formato correcto (dd/mm/yyyy).");
+            }
         }
+        return date;
     }
 
     public static void main(String[] args) {

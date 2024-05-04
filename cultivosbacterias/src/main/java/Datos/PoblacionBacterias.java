@@ -13,8 +13,9 @@ public class PoblacionBacterias {
     private int dosisFinalAlimento;
     private int incrementarHastaDia;
     private int[] dosisDiariaAlimento;
+    private int[] comida;
 
-    public PoblacionBacterias(String nombre, Date fechaInicio, Date fechaFin, int cantidadInicialBacterias, double temperatura, String condicionesLuz, int dosisInicialAlimento, int incrementarHastaDia, int dosisFinalAlimento) {
+    public PoblacionBacterias(String nombre, Date fechaInicio, Date fechaFin, int cantidadInicialBacterias, double temperatura, String condicionesLuz, int comidaInicial, int comidaFinal, int diaComidaDisminuye) {
         this.nombre = nombre;
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
@@ -25,6 +26,7 @@ public class PoblacionBacterias {
         this.incrementarHastaDia = incrementarHastaDia;
         this.dosisFinalAlimento = dosisFinalAlimento;
         this.dosisDiariaAlimento = calcularDosisDiariaAlimento();
+        this.comida = calcularComida(comidaInicial, comidaFinal, diaComidaDisminuye);
     }
 
     private int[] calcularDosisDiariaAlimento() {
@@ -35,6 +37,19 @@ public class PoblacionBacterias {
             dosisDiaria += (dosisFinalAlimento - dosisInicialAlimento) / incrementarHastaDia;
         }
         return dosisDiariaAlimento;
+    }
+
+    private int[] calcularComida(int comidaInicial, int comidaFinal, int diaComidaDisminuye) {
+        int[] comida = new int[30];
+        int incrementoComida = (comidaFinal - comidaInicial) / diaComidaDisminuye;
+        for (int i = 0; i < diaComidaDisminuye; i++) {
+            comida[i] = comidaInicial + i * incrementoComida;
+        }
+        int decrementoComida = (comidaFinal - comidaInicial) / (30 - diaComidaDisminuye);
+        for (int i = diaComidaDisminuye; i < 30; i++) {
+            comida[i] = comidaFinal - (i - diaComidaDisminuye) * decrementoComida;
+        }
+        return comida;
     }
 
     public String getNombre() {
