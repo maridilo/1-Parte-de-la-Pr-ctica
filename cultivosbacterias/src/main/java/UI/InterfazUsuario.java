@@ -8,6 +8,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class InterfazUsuario {
     private Experimento experimento;
@@ -102,8 +105,18 @@ public class InterfazUsuario {
                 experimento = new Experimento();
                 break;
             case 3:
-                // Aquí deberías pedir al usuario los datos necesarios para crear una nueva población de bacterias
-                // y luego agregarla al experimento actual.
+                String nombrePoblacion = JOptionPane.showInputDialog(frame, "Ingrese el nombre de la población de bacterias:");
+                String fechaInicioStr = JOptionPane.showInputDialog(frame, "Ingrese la fecha de inicio (formato: dd/mm/yyyy):");
+                String fechaFinStr = JOptionPane.showInputDialog(frame, "Ingrese la fecha de fin (formato: dd/mm/yyyy):");
+                Date fechaInicio = parseDate(fechaInicioStr);
+                Date fechaFin = parseDate(fechaFinStr);
+                int cantidadInicial = Integer.parseInt(JOptionPane.showInputDialog(frame, "Ingrese la cantidad inicial de bacterias:"));
+                double temperatura = Double.parseDouble(JOptionPane.showInputDialog(frame, "Ingrese la temperatura:"));
+                String condicionesLuz = JOptionPane.showInputDialog(frame, "Ingrese las condiciones de luz:");
+                int dosisInicialAlimento = Integer.parseInt(JOptionPane.showInputDialog(frame, "Ingrese la dosis inicial de alimento:"));
+
+                PoblacionBacterias nuevaPoblacion = new PoblacionBacterias(nombrePoblacion, fechaInicio, fechaFin, cantidadInicial, temperatura, condicionesLuz, dosisInicialAlimento, 10, 100);
+                experimento.agregarPoblacion(nuevaPoblacion);
                 break;
             case 4:
                 for (PoblacionBacterias poblacion : experimento.obtenerPoblaciones()) {
@@ -115,10 +128,24 @@ public class InterfazUsuario {
                 experimento.eliminarPoblacion(nombre);
                 break;
             case 6:
-                nombre = JOptionPane.showInputDialog(frame, "Ingrese el nombre de la población de bacterias que desea ver:");
+                nombre = JOptionPane.showInputDialog(frame, "Ingrese el nombre de la población de bacterias de la que desea ver la información detallada:");
                 PoblacionBacterias poblacion = experimento.obtenerPoblacion(nombre);
                 if (poblacion != null) {
-                    // Aquí deberías imprimir la información detallada de la población de bacterias
+                String informacionDetallada = "Nombre: " + poblacion.getNombre() + "\n" +
+                            "Fecha de inicio: " + poblacion.getFechaInicio() + "\n" +
+                            "Fecha de fin: " + poblacion.getFechaFin() + "\n" +
+                            "Cantidad inicial de bacterias: " + poblacion.getCantidadInicialBacterias() + "\n" +
+                            "Temperatura: " + poblacion.getTemperatura() + "\n" +
+                            "Condiciones de luz: " + poblacion.getCondicionesLuz() + "\n" +
+                            "Dosis inicial de alimento: " + poblacion.getDosisInicialAlimento() + "\n" +
+                            "Dosis final de alimento: " + poblacion.getDosisFinalAlimento() + "\n" +
+                            "Incrementar hasta el día: " + poblacion.getIncrementarHastaDia() + "\n" +
+                            "Dosis diaria de alimento:\n";
+                    int[] dosisDiariaAlimento = poblacion.getDosisDiariaAlimento();
+                    for (int i = 0; i < dosisDiariaAlimento.length; i++) {
+                        informacionDetallada += "Día " + (i + 1) + ": " + dosisDiariaAlimento[i] + "\n";
+                    }
+                    JOptionPane.showMessageDialog(frame, informacionDetallada, "Información detallada de la población de bacterias", JOptionPane.INFORMATION_MESSAGE);
                 } else {
                     JOptionPane.showMessageDialog(frame, "No se encontró la población de bacterias.");
                 }
@@ -137,6 +164,16 @@ public class InterfazUsuario {
             default:
                 JOptionPane.showMessageDialog(frame, "Opción no válida. Por favor, elija una opción del menú.");
                 break;
+        }
+    }
+
+    private Date parseDate(String dateStr) {
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        try {
+            return formatter.parse(dateStr);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
